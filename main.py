@@ -28,14 +28,10 @@ def convert_to_gray_scale(image):
     return gray_scale
 
 
-def draw_histogram(image_array):
+def draw_histogram(value, frequency):
     """
-    Draws histogram of the given image array.
-
-    :param image_array: Image array with elements in range [0, 1]
+    Draws histogram based on the image intensity values and their corresponding frequencies.
     """
-    image_array = np.array(image_array * 255, dtype=np.uint8)
-    value, frequency = np.unique(image_array, return_counts=True)
 
     fig, ax = plt.subplots()
     ax.bar(value, frequency, width=0.8)
@@ -45,11 +41,21 @@ def draw_histogram(image_array):
     plt.show()
 
 
+def get_value_frequencies(image_array):
+    """
+    Returns a tuple such that the first value of the pair is the unique pixel intensities and the second value of the
+    pair is the corresponding frequency.
+    """
+    image_array = np.array(image_array * 255, dtype=np.uint8)
+    return np.unique(image_array, return_counts=True)
+
+
 def main():
     image_path = "SoroushMehraban.jpg"
     image_array = read_grayscale_image(image_path)
 
-    draw_histogram(image_array)
+    value, frequency = get_value_frequencies(image_array)
+    draw_histogram(value, frequency)
 
 
 if __name__ == '__main__':
