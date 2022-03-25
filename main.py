@@ -28,16 +28,16 @@ def convert_to_gray_scale(image):
     return np.array(gray_scale * 255, dtype=np.uint8)
 
 
-def draw_histogram(value, frequency):
+def draw_histogram(value, frequency, title, x_label, y_label):
     """
     Draws histogram based on the image intensity values and their corresponding frequencies.
     """
 
     fig, ax = plt.subplots()
     ax.bar(value, frequency, width=0.8)
-    ax.set(title="Image Histogram",
-           xlabel="Intensity Value",
-           ylabel="Count")
+    ax.set(title=title,
+           xlabel=x_label,
+           ylabel=y_label)
     plt.show()
 
 
@@ -49,9 +49,8 @@ def get_value_frequencies(image_array):
     return np.unique(image_array, return_counts=True)
 
 
-def create_mapper(value, frequency, image_height, image_width):
+def create_mapper(value, cumulative_frequency, image_height, image_width):
     """Creates a mapper that is a dictionary to map each value intensity of the image to a new intensity"""
-    cumulative_frequency = np.cumsum(frequency)
     color_levels = value.shape[0]
 
     mapper = {}
@@ -82,10 +81,31 @@ def main():
     image_height, image_width = image_array.shape
 
     value, frequency = get_value_frequencies(image_array)
-    draw_histogram(value, frequency)
+    cumulative_frequency = np.cumsum(frequency)
 
-    mapper = create_mapper(value, frequency, image_height, image_width)
+    draw_histogram(value, frequency,
+                   title="Image Histogram (Before mapping)",
+                   x_label="Intensity value",
+                   y_label="Count")
+    draw_histogram(value, cumulative_frequency,
+                   title="Image Histogram (Before mapping)",
+                   x_label="Intensity value",
+                   y_label="Count (Cumulative)")
+
+    mapper = create_mapper(value, cumulative_frequency, image_height, image_width)
     map_image(image_array, mapper)
+
+    value, frequency = get_value_frequencies(image_array)
+    cumulative_frequency = np.cumsum(frequency)
+
+    draw_histogram(value, frequency,
+                   title="Image Histogram (After mapping)",
+                   x_label="Intensity value",
+                   y_label="Count")
+    draw_histogram(value, cumulative_frequency,
+                   title="Image Histogram (After mapping)",
+                   x_label="Intensity value",
+                   y_label="Count (Cumulative)")
 
     store_image(image_array)
 
