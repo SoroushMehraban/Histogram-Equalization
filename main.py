@@ -19,13 +19,13 @@ def convert_to_gray_scale(image):
     Reference of the formula: https://www.tutorialspoint.com/dip/grayscale_to_rgb_conversion.htm
 
     :param image: RGB image read by PIL.Image
-    :return: gray_sale np array
+    :return: gray_sale np array that elements are in range [0, 255]
     """
     image_array = np.array(image, dtype=np.float32)
     image_array /= 255
     R, G, B = image_array[..., 0], image_array[..., 1], image_array[..., 2]
     gray_scale = 0.3 * R + 0.59 * G + 0.11 * B
-    return gray_scale
+    return np.array(gray_scale * 255, dtype=np.uint8)
 
 
 def draw_histogram(value, frequency):
@@ -46,16 +46,48 @@ def get_value_frequencies(image_array):
     Returns a tuple such that the first value of the pair is the unique pixel intensities and the second value of the
     pair is the corresponding frequency.
     """
-    image_array = np.array(image_array * 255, dtype=np.uint8)
     return np.unique(image_array, return_counts=True)
 
 
+def create_mapper(value, frequency, image_height, image_width):
+    """Creates a mapper that is a dictionary to map each value intensity of the image to a new intensity"""
+    cumulative_frequency = np.cumsum(frequency)
+    color_levels = value.shape[0]
+
+    mapper = {}
+    for color, cum_sum in zip(value, cumulative_frequency):
+        mapper[color] = np.ceil((color_levels - 1) * cum_sum / (image_width * image_height))
+
+    return mapper
+
+
+def map_image(image_array, mapper):
+    """Map intensity values of the image_array into new values based on the mapper"""
+    image_height, image_width = image_array.shape
+    for i in range(image_height):
+        for j in range(image_width):
+            image_array[i, j] = mapper[image_array[i, j]]
+
+
+def store_image(image_array):
+    """Stores the given image_array"""
+    image = Image.fromarray(np.array(image_array, dtype=np.uint8))
+    image.save('out.jpg')
+
+
 def main():
-    image_path = "SoroushMehraban.jpg"
+    image_path = "image.png"
+
     image_array = read_grayscale_image(image_path)
+    image_height, image_width = image_array.shape
 
     value, frequency = get_value_frequencies(image_array)
     draw_histogram(value, frequency)
+
+    mapper = create_mapper(value, frequency, image_height, image_width)
+    map_image(image_array, mapper)
+
+    store_image(image_array)
 
 
 if __name__ == '__main__':
