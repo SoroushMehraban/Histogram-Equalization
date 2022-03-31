@@ -22,10 +22,9 @@ def convert_to_gray_scale(image):
     :return: gray_sale np array that elements are in range [0, 255]
     """
     image_array = np.array(image, dtype=np.float32)
-    image_array /= 255
     R, G, B = image_array[..., 0], image_array[..., 1], image_array[..., 2]
     gray_scale = 0.3 * R + 0.59 * G + 0.11 * B
-    return np.array(gray_scale * 255, dtype=np.uint8)
+    return np.array(gray_scale, dtype=np.uint8)
 
 
 def draw_histogram(value, frequency, title, x_label, y_label):
