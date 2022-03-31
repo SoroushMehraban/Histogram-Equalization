@@ -32,9 +32,28 @@ def draw_histogram(value, frequency, title, x_label, y_label):
     """
     Draws histogram based on the image intensity values and their corresponding frequencies.
     """
+    frequency = np.array(frequency, dtype=np.float32) / np.max(frequency)
 
     fig, ax = plt.subplots()
     ax.bar(value, frequency, width=0.8)
+    ax.set(title=title,
+           xlabel=x_label,
+           ylabel=y_label)
+    plt.show()
+
+
+def draw_cumulative_frequency_plot(value, frequency, title, x_label, y_label):
+    """
+    Draws a plot based on the image intensity values and their corresponding cumulative frequencies.
+    """
+    frequency = np.array(frequency, dtype=np.float32) / np.max(frequency)
+
+    fig, ax = plt.subplots()
+    ax.plot(value, frequency)
+
+    linear_line_values = np.linspace(0, 1, num=2)
+    ax.plot([np.min(value), np.max(value)], linear_line_values, linestyle='--')
+
     ax.set(title=title,
            xlabel=x_label,
            ylabel=y_label)
@@ -87,10 +106,10 @@ def main():
                    title="Image Histogram (Before mapping)",
                    x_label="Intensity value",
                    y_label="Count")
-    draw_histogram(value, cumulative_frequency,
-                   title="Image Histogram (Before mapping)",
-                   x_label="Intensity value",
-                   y_label="Count (Cumulative)")
+    draw_cumulative_frequency_plot(value, cumulative_frequency,
+                                   title="Cumulative Frequency (Before mapping)",
+                                   x_label="Intensity value",
+                                   y_label="Count (Cumulative)")
 
     mapper = create_mapper(value, cumulative_frequency, image_height, image_width)
     map_image(image_array, mapper)
@@ -102,10 +121,10 @@ def main():
                    title="Image Histogram (After mapping)",
                    x_label="Intensity value",
                    y_label="Count")
-    draw_histogram(value, cumulative_frequency,
-                   title="Image Histogram (After mapping)",
-                   x_label="Intensity value",
-                   y_label="Count (Cumulative)")
+    draw_cumulative_frequency_plot(value, cumulative_frequency,
+                                   title="Cumulative Frequency (After mapping)",
+                                   x_label="Intensity value",
+                                   y_label="Count (Cumulative)")
 
     store_image(image_array)
 
